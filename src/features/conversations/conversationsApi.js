@@ -32,13 +32,15 @@ export const conversationsApi = apiSlice.injectEndpoints({
           await cacheDataLoaded;
           socket.on("conversation", (data) => {
             updateCachedData((draft) => {
-              const conversation = draft?.data.find((c) => c.id == data?.data?.id);
+              const conversation = draft?.data.find(
+                (c) => c.id == data?.data?.id
+              );
 
               if (conversation?.id) {
                 conversation.message = data?.data?.message;
                 conversation.timestamp = data?.data?.timestamp;
               } else {
-                // do nothing
+                draft?.data.unshift(data?.data);
               }
             });
           });
@@ -84,6 +86,15 @@ export const conversationsApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversation = await queryFulfilled;
+        dispatch(
+          apiSlice.util.updateQueryData(
+            "getConversations",
+            arg.sender,
+            (draft) => {
+              draft.data.unshift(conversation.data);
+            }
+          )
+        );
         if (conversation?.data?.id) {
           const users = arg.data.users;
           const senderUser = users.find((user) => user.email === arg.sender);
