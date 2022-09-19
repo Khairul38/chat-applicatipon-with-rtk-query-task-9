@@ -11,7 +11,7 @@ export const messagesApi = apiSlice.injectEndpoints({
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
         // create socket
-        const socket = io("https://fake-auth-api-json-server.herokuapp.com", {
+        const socket = io("http://localhost:9000", {
           reconnectionDelay: 1000,
           reconnection: true,
           reconnectionAttemps: 10,
@@ -26,17 +26,17 @@ export const messagesApi = apiSlice.injectEndpoints({
             console.log(data);
             updateCachedData((draft) => {
               console.log(JSON.stringify(draft));
-              
-              const conversation = draft.find(
-                (c) => c.id == data?.data?.id
-              );
+              draft.push(data?.data);
+              // const conversation = draft.find(
+              //   (c) => c.id == data?.data?.id
+              // );
 
-              if (conversation?.id) {
-                conversation.message = data?.data?.message;
-                conversation.timestamp = data?.data?.timestamp;
-              } else {
-                draft.push(data?.data);
-              }
+              // if (conversation?.id) {
+              //   conversation.message = data?.data?.message;
+              //   conversation.timestamp = data?.data?.timestamp;
+              // } else {
+              //   draft.push(data?.data);
+              // }
             });
           });
         } catch (error) {}

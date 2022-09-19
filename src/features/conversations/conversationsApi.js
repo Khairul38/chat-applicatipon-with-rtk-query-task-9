@@ -19,7 +19,7 @@ export const conversationsApi = apiSlice.injectEndpoints({
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
         // create socket
-        const socket = io("https://fake-auth-api-json-server.herokuapp.com", {
+        const socket = io("http://localhost:9000", {
           reconnectionDelay: 1000,
           reconnection: true,
           reconnectionAttemps: 10,
@@ -31,7 +31,9 @@ export const conversationsApi = apiSlice.injectEndpoints({
         try {
           await cacheDataLoaded;
           socket.on("conversation", (data) => {
+            // console.log(data);
             updateCachedData((draft) => {
+              // console.log(JSON.stringify(draft?.data));
               const conversation = draft?.data.find(
                 (c) => c.id == data?.data?.id
               );
@@ -86,15 +88,15 @@ export const conversationsApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversation = await queryFulfilled;
-        dispatch(
-          apiSlice.util.updateQueryData(
-            "getConversations",
-            arg.sender,
-            (draft) => {
-              draft.data.unshift(conversation.data);
-            }
-          )
-        );
+        // dispatch(
+        //   apiSlice.util.updateQueryData(
+        //     "getConversations",
+        //     arg.sender,
+        //     (draft) => {
+        //       draft.data.unshift(conversation.data);
+        //     }
+        //   )
+        // );
         if (conversation?.data?.id) {
           const users = arg.data.users;
           const senderUser = users.find((user) => user.email === arg.sender);
@@ -152,15 +154,17 @@ export const conversationsApi = apiSlice.injectEndpoints({
             ).unwrap();
 
             // update message cache pessimistically start
-            dispatch(
-              apiSlice.util.updateQueryData(
-                "getMessages",
-                res.conversationId.toString(),
-                (draft) => {
-                  draft.push(res);
-                }
-              )
-            );
+            // setTimeout(() => {
+            //   dispatch(
+            //     apiSlice.util.updateQueryData(
+            //       "getMessages",
+            //       res.conversationId.toString(),
+            //       (draft) => {
+            //         draft.push(res);
+            //       }
+            //     )
+            //   );
+            // }, 1000);
             // update message cache pessimistically end
           }
         } catch (error) {
