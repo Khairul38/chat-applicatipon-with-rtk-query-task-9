@@ -41,7 +41,7 @@ export const conversationsApi = apiSlice.injectEndpoints({
               if (conversation?.id) {
                 conversation.message = data?.data?.message;
                 conversation.timestamp = data?.data?.timestamp;
-              } else {
+              } else if (data?.data?.participants.includes(arg)) {
                 draft?.data.unshift(data?.data);
               }
             });
@@ -154,17 +154,17 @@ export const conversationsApi = apiSlice.injectEndpoints({
             ).unwrap();
 
             // update message cache pessimistically start
-            // setTimeout(() => {
-            //   dispatch(
-            //     apiSlice.util.updateQueryData(
-            //       "getMessages",
-            //       res.conversationId.toString(),
-            //       (draft) => {
-            //         draft.push(res);
-            //       }
-            //     )
-            //   );
-            // }, 1000);
+
+            // dispatch(
+            //   apiSlice.util.updateQueryData(
+            //     "getMessages",
+            //     res.conversationId.toString(),
+            //     (draft) => {
+            //       draft.push(res);
+            //     }
+            //   )
+            // );
+
             // update message cache pessimistically end
           }
         } catch (error) {

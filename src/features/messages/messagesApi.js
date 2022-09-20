@@ -6,6 +6,13 @@ export const messagesApi = apiSlice.injectEndpoints({
     getMessages: builder.query({
       query: (id) =>
         `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=1&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
+      transformResponse(apiResponse, meta) {
+        const totalCount = meta.response.headers.get("X-Total-Count");
+        return {
+          data: apiResponse,
+          totalCount,
+        };
+      },
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
@@ -26,7 +33,10 @@ export const messagesApi = apiSlice.injectEndpoints({
             console.log(data);
             updateCachedData((draft) => {
               console.log(JSON.stringify(draft));
-              draft.push(data?.data);
+
+              if (arg == data?.data?.conversationId) {
+                draft.data.push(data?.data);
+              }
               // const conversation = draft.find(
               //   (c) => c.id == data?.data?.id
               // );
@@ -42,6 +52,36 @@ export const messagesApi = apiSlice.injectEndpoints({
         } catch (error) {}
         await cacheEntryRemoved;
         socket.close();
+      },
+    }),
+    getMoreMessages: builder.query({
+      query: ({ id, page }) =>
+        `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const messages = await queryFulfilled;
+          console.log(messages);
+          if (messages?.data?.length > 0) {
+            // update messages cache pessimistically start
+            console.log(arg.id);
+            dispatch(
+              apiSlice.util.updateQueryData(
+                "getMessages",
+                arg.id.toString(),
+                (draft) => {
+                  return {
+                    data: [...draft.data, ...messages.data],
+                    totalCount: Number(draft.totalCount),
+                  };
+                }
+              )
+            );
+
+            // update messages cache pessimistically end
+          }
+        } catch (error) {
+          // patchResult.undo();
+        }
       },
     }),
     addMessage: builder.mutation({

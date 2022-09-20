@@ -2,7 +2,10 @@ import gravatarUrl from "gravatar-url";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { conversationsApi, useGetConversationsQuery } from "../../features/conversations/conversationsApi";
+import {
+  conversationsApi,
+  useGetConversationsQuery,
+} from "../../features/conversations/conversationsApi";
 import getPartnerInfo from "../../utils/getPartnerInfo";
 import Error from "../ui/Error";
 import ChatItem from "./ChatItem";
@@ -13,13 +16,12 @@ import { useEffect } from "react";
 export default function ChatItems() {
   const { user } = useSelector((state) => state.auth) || {};
 
-  const { data, isLoading, isError, error } = useGetConversationsQuery(
-    user.email
-  ) || {};
+  const { data, isLoading, isError, error } =
+    useGetConversationsQuery(user.email) || {};
   const { data: conversations, totalCount } = data || {};
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const fetchMoreData = () => {
     setPage((prevPage) => prevPage + 1);

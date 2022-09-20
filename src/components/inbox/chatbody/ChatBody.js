@@ -8,7 +8,8 @@ import Options from "./Options";
 
 export default function ChatBody() {
   const { id } = useParams();
-  const { data: messages, isLoading, isError, error } = useGetMessagesQuery(id);
+  const { data, isLoading, isError, error } = useGetMessagesQuery(id) || {};
+  const { data: messages, totalCount } = data || {};
 
   // decide what to render
   let content = null;
@@ -27,7 +28,7 @@ export default function ChatBody() {
     content = (
       <>
         <ChatHead message={messages[0]} />
-        <Messages messages={messages} />
+        <Messages messages={messages} totalCount={totalCount} />
         <Options info={messages[0]} />
       </>
     );
