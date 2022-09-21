@@ -29,7 +29,7 @@ export default function Messages({ messages, totalCount }) {
     }
   }, [page, dispatch, messages]);
 
-  console.log(hasMore, page, totalCount);
+  // console.log(hasMore, page, totalCount);
 
   useEffect(() => {
     if (totalCount > 0) {
@@ -41,7 +41,7 @@ export default function Messages({ messages, totalCount }) {
     }
   }, [totalCount, page]);
 
-  console.log(messages);
+  // console.log(messages);
   return (
     <div
       id="scrollableDiv"
