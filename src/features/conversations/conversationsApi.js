@@ -22,7 +22,7 @@ export const conversationsApi = apiSlice.injectEndpoints({
         const socket = io("https://fake-auth-api-json-server.onrender.com", {
           reconnectionDelay: 1000,
           reconnection: true,
-          reconnectionAttemps: 10,
+          reconnectionAttempts: 10,
           transports: ["websocket"],
           agent: false,
           upgrade: false,
